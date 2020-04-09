@@ -18,37 +18,29 @@ public class Maze {
         this.goalPos = new Position(rowsNum-1, colsNum-1);
     }
 
-    public void setStartPosition(int x, int y){
-        this.startPos = new Position(x, y);
-    }
-    public void setGoalPosition(int x, int y){
-        this.goalPos = new Position(x, y);
-    }
+    public void setStartPosition(int x, int y){ this.startPos = new Position(x, y); }
+    public void setGoalPosition(int x, int y){ this.goalPos = new Position(x, y); }
 
-    public Position getStartPosition(){
-        return startPos;
-    }
-    public Position getGoalPosition(){
-        return goalPos;
-    }
+    public Position getStartPosition(){ return startPos; }
+    public Position getGoalPosition(){ return goalPos; }
+
     public int getRowsNum() { return rowsNum; }
     public int getColsNum() { return colsNum; }
 
-    public void setValue(Position pos, int val){
-        this.theMaze[pos.getX()][pos.getY()] = val;
-    }
+    public void setValue(Position pos, int val){ this.theMaze[pos.getX()][pos.getY()] = val; }
+    public int getValue(Position pos){ return this.theMaze[pos.getX()][pos.getY()]; }
 
-    public int getValue(Position pos){
-        return this.theMaze[pos.getX()][pos.getY()];
-    }
+    //public Position getPos(int x, int y){return }
 
     // Method that returns a list of neighbors positions to a given position
     public List<Position> getNeighbors(Position pos){
-        List<Position> neighbors = new ArrayList<>();
+        List<Position> neighbors = new ArrayList<>(4);
         Position up = new Position(pos.getX() - 1, pos.getY());
         Position under = new Position(pos.getX() + 1, pos.getY());
         Position left = new Position(pos.getX(), pos.getY() - 1);
         Position right = new Position(pos.getX() , pos.getY() + 1);
+        //old implementation
+        /*
         if ((pos.getX() != 0) && (pos.getX() != this.getRowsNum() - 1)){
             neighbors.add(up);
             neighbors.add(under);
@@ -68,9 +60,37 @@ public class Maze {
         }
         else{
             neighbors.add(left);
+        }*/
+
+
+        //new implementation (always returns list of 4 neighbors: 0 - up, 1 - under, 2 - left, 3 - right)
+        if ((pos.getX() != 0) && (pos.getX() != this.getRowsNum() - 1)){
+            neighbors.add(0,up);
+            neighbors.add(1,under);
+        }
+        else if (pos.getX() == 0 ){
+            neighbors.add(0,null);
+            neighbors.add(1,under);
+        }
+        else{
+            neighbors.add(0,up);
+            neighbors.add(1,null);
+        }
+        if ((pos.getY() != 0) && (pos.getY() != this.getColsNum() - 1)){
+            neighbors.add(2,left);
+            neighbors.add(3,right);
+        }
+        else if (pos.getY() == 0 ){
+            neighbors.add(2,null);
+            neighbors.add(3,right);
+        }
+        else{
+            neighbors.add(2,left);
+            neighbors.add(3,null);
         }
         return neighbors;
     }
+
 
    // public Position getPos()
 
@@ -92,7 +112,7 @@ public class Maze {
         }
     }
 
-    // Function to set the start and goal positions of the maze
+    // Function to randomly set the start and goal positions of the maze
     public void setStartAndGoal(){
         int startPosX, startPosY, goalPosX, goalPosY, sameVertex;
         do{
@@ -126,7 +146,5 @@ public class Maze {
         }while(sameVertex == 1);
         this.setStartPosition(startPosX, startPosY);
         this.setGoalPosition(goalPosX, goalPosY);
-
-        /// BLA gilad
     }
 }
