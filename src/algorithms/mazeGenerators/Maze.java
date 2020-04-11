@@ -21,6 +21,35 @@ public class Maze {
     public void setStartPosition(int x, int y){ this.startPos = new Position(x, y); }
     public void setGoalPosition(int x, int y){ this.goalPos = new Position(x, y); }
 
+    public Position randPosOnVertex(){
+        int PosX, PosY;
+        PosX = (int)(Math.random()*this.getRowsNum());
+        if (PosX == 0 || PosX == this.getRowsNum()-1){
+            PosY = (int)(Math.random()*this.getColsNum());
+        }
+        else{
+            PosY = ((int)(Math.random()*2)) * (this.getColsNum()-1);
+        }
+        return new Position(PosX, PosY);
+    }
+
+    public boolean sameVertex(Position start, Position goal){
+        boolean sameVertex = false;
+        if (start.getX()== 0 && goal.getX() == 0){
+            sameVertex = true;
+        }
+        if (start.getX() == this.getRowsNum()-1 && goal.getX() == this.getRowsNum()-1){
+            sameVertex = true;
+        }
+        if (start.getY() == 0 && goal.getY() == 0){
+            sameVertex = true;
+        }
+        if (start.getY() == this.getColsNum()-1 && goal.getY() == this.getColsNum()-1){
+            sameVertex = true;
+        }
+        return sameVertex;
+    }
+
     public Position getStartPosition(){ return startPos; }
     public Position getGoalPosition(){ return goalPos; }
 
@@ -30,65 +59,44 @@ public class Maze {
     public void setValue(Position pos, int val){ this.theMaze[pos.getX()][pos.getY()] = val; }
     public int getValue(Position pos){ return this.theMaze[pos.getX()][pos.getY()]; }
 
-    //public Position getPos(int x, int y){return }
-
     // Method that returns a list of neighbors positions to a given position
     public List<Position> getNeighbors(Position pos){
-        List<Position> neighbors = new ArrayList<>(4);
-        Position up = new Position(pos.getX() - 1, pos.getY());
-        Position under = new Position(pos.getX() + 1, pos.getY());
-        Position left = new Position(pos.getX(), pos.getY() - 1);
-        Position right = new Position(pos.getX() , pos.getY() + 1);
-        //old implementation
-        /*
-        if ((pos.getX() != 0) && (pos.getX() != this.getRowsNum() - 1)){
-            neighbors.add(up);
-            neighbors.add(under);
+        List<Position> neighbors = new ArrayList<>();
+        if (pos.getX()-1 >= 0){
+            neighbors.add(new Position(pos.getX()-1, pos.getY()));
         }
-        else if (pos.getX() == 0 ){
-            neighbors.add(under);
+        if (pos.getX()+1 <= this.getRowsNum()-1){
+            neighbors.add(new Position(pos.getX()+1, pos.getY()));
         }
-        else{
-            neighbors.add(up);
+        if (pos.getY()-1 >= 0){
+            neighbors.add(new Position(pos.getX() , pos.getY()-1));
         }
-        if ((pos.getY() != 0) && (pos.getY() != this.getColsNum() - 1)){
-            neighbors.add(left);
-            neighbors.add(right);
-        }
-        else if (pos.getY() == 0 ){
-            neighbors.add(right);
-        }
-        else{
-            neighbors.add(left);
-        }*/
-
-
-        //new implementation (always returns list of 4 neighbors: 0 - up, 1 - under, 2 - left, 3 - right)
-        if ((pos.getX() != 0) && (pos.getX() != this.getRowsNum() - 1)){
-            neighbors.add(0,up);
-            neighbors.add(1,under);
-        }
-        else if (pos.getX() == 0 ){
-            neighbors.add(0,null);
-            neighbors.add(1,under);
-        }
-        else{
-            neighbors.add(0,up);
-            neighbors.add(1,null);
-        }
-        if ((pos.getY() != 0) && (pos.getY() != this.getColsNum() - 1)){
-            neighbors.add(2,left);
-            neighbors.add(3,right);
-        }
-        else if (pos.getY() == 0 ){
-            neighbors.add(2,null);
-            neighbors.add(3,right);
-        }
-        else{
-            neighbors.add(2,left);
-            neighbors.add(3,null);
+        if (pos.getY()+1 <= this.getColsNum()-1) {
+            neighbors.add(new Position(pos.getX(), pos.getY()+1));
         }
         return neighbors;
+    }
+
+    // Method that returns position of unvisited cell for MyMazeGenerator generate function
+    public Position unvisitedPosition(Position wall, Position neighbor){
+        Position uc = new Position(-1,-1);
+        if (wall.getX() == neighbor.getX()){
+            if (wall.getY() > neighbor.getY() && wall.getY()+1 <= this.getColsNum()-1){
+                uc = new Position(wall.getX(), wall.getY()+1);
+            }
+            if (wall.getY() < neighbor.getY() && wall.getY()-1 >= 0){
+                uc = new Position(wall.getX(), wall.getY()-1);
+            }
+        }
+        else{
+            if (wall.getX() > neighbor.getX() && wall.getX()+1 <= this.getColsNum()-1){
+                uc = new Position(wall.getX()+1, wall.getY());
+            }
+            if (wall.getX() < neighbor.getX() && wall.getX()-1 >= 0){
+                uc = new Position(wall.getX()-1, wall.getY());
+            }
+            }
+        return uc;
     }
 
 

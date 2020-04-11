@@ -7,94 +7,63 @@ public class MyMazeGenerator extends AMazeGenerator{
     @Override
     public Maze generate(int rows, int columns) {
         Maze newMaze = new Maze(rows, columns);
-        newMaze.setStartAndGoal();
+        //newMaze.setStartAndGoal();
         for (int i=0; i<rows; i++){
             for (int j=0; j<columns; j++){
                 newMaze.setValue(new Position(i,j),1);
             }
         }
-
         //creating lists
         List<Position> walls = new ArrayList<>();
         List<Position> visited = new ArrayList<>();
 
         // Starting with the start position of the maze and building a tree from there
-        /*what was was
-        Position randPos = newMaze.getStartPosition();
-        newMaze.setValue(randPos, 0);
-        List<Position> randNeighbors = newMaze.getNeighbors(randPos);
-        for (int i=0; i<randNeighbors.size(); i++){
-            if(newMaze.getValue(randNeighbors.get(i)) == 1){
-                walls.add(randNeighbors.get(i));
-                visited.add(randNeighbors.get(i));
-            }
-        }*/
-
-        //ronen changed
+        Position startPos = newMaze.randPosOnVertex();
+        newMaze.setStartPosition(startPos.getX(), startPos.getY());
         newMaze.setValue(newMaze.getStartPosition(), 0);
+        visited.add(newMaze.getStartPosition());
         List<Position> startPositionNeighbors = newMaze.getNeighbors(newMaze.getStartPosition());
         for (Position startPositionNeighbor : startPositionNeighbors) {
             if (startPositionNeighbor != null && newMaze.getValue(startPositionNeighbor) == 1) {
                 walls.add(startPositionNeighbor);
             }
         }
-        visited.add(newMaze.getStartPosition());
-
+        //Going through all walls
         while(!walls.isEmpty()){
             int wallIndex = (int)(Math.random()*(walls.size()));
             Position wall = walls.get(wallIndex);
             List<Position> wallNeighbors = newMaze.getNeighbors(wall);
-            int breakWall = 0;
-            for (int i=0; i<wallNeighbors.size(); i+=2){
-                if (wallNeighbors.get(i) != null && wallNeighbors.get(i+1) != null){
-                    if (visited.contains(wallNeighbors.get(i))){
-                        if (!visited.contains(wallNeighbors.get(i+1))){
-                            breakWall = 1;
-                        }
-                    }
-                    else{
-                        if (visited.contains(wallNeighbors.get(i+1))){
-                            breakWall = 1;
+            int counter = 0;
+            Position selectedNeighbor = new Position(-1,-1);
+            for (Position wallNeighbor : wallNeighbors) {
+                if (visited.contains(wallNeighbor)) {
+                    counter++;
+                    selectedNeighbor = wallNeighbor;
+                }
+            }
+            //if only one visited cell then break wall
+            if (counter == 1){
+                newMaze.setValue(wall, 0);
+                visited.add(wall);
+                Position unvisited = newMaze.unvisitedPosition(wall, selectedNeighbor);
+                if (unvisited.getX() != -1){
+                    newMaze.setValue(unvisited, 0);
+                    visited.add(unvisited);
+                    List<Position> toAddtoWalls = newMaze.getNeighbors(unvisited);
+                    for (Position toAddtoWall : toAddtoWalls) {
+                        if (newMaze.getValue(toAddtoWall) == 1 && !walls.contains(toAddtoWall)) {
+                            walls.add(toAddtoWall);
                         }
                     }
                 }
-            }
-            if (breakWall == 1){
-                newMaze.setValue(wall,0);
-                visited.add(wall);
+
             }
             walls.remove(wall);
-
-//            if(randPos.getX() ) {
-//                if (curWallRow < randPos.getX()) {
-//                    if (curWallRow > 0) {
-//                        Position curPos = new Position(curWallRow - 1, curWallCol);
-//                        if (newMaze.getValue(curPos) == 1) {
-//                            newMaze.setValue(walls.get(rand), 0);
-//                            newMaze.setValue(curPos, 0);
-//                            randNeighbors = newMaze.getNeighbors(curPos);
-//                            for (int i = 0; i < randNeighbors.size(); i++) {
-//                                if (newMaze.getValue(randNeighbors.get(i)) == 1) {
-//                                    walls.add(randNeighbors.get(i));
-//                                }
-//                            }
-//                            randNeighbors.remove(rand);
-//                        }
-//                    }
-//                }
-//            }
-            /* check if only one of the 2 cells the wall divides is visited
-             if(...){
-                wall is passage
-
-
-              }
-
-              change randPos;
-             */
-
         }
-
+        do{
+            Position goalPos = newMaze.randPosOnVertex();
+            newMaze.setGoalPosition(goalPos.getX(), goalPos.getY());
+        }while(newMaze.sameVertex(newMaze.getStartPosition(),newMaze.getGoalPosition()) || newMaze.getValue(newMaze.getGoalPosition()) == 1);
         return newMaze;
     }
 }
